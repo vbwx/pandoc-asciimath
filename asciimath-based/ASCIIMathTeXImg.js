@@ -54,6 +54,7 @@ var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
   AMsup   = {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
   AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
   AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
+  AMvar   = {input:"#",    tag:"mtext", output:"mathit", tex:null, ttype:TEXT},
   AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
 var AMsymbols = [
@@ -319,7 +320,7 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
-AMtext, AMmbox, AMquote,
+AMtext, AMmbox, AMvar, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
 {input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
@@ -583,18 +584,26 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     }
     return [node,result[1]];
   case TEXT:
-      if (symbol!=AMquote) str = AMremoveCharsAndBlanks(str,symbol.input.length);
+      var italic;
+      if (symbol!=AMquote && symbol!=AMvar) str = AMremoveCharsAndBlanks(str,symbol.input.length);
       if (str.charAt(0)=="{") i=str.indexOf("}");
       else if (str.charAt(0)=="(") i=str.indexOf(")");
       else if (str.charAt(0)=="[") i=str.indexOf("]");
-      else if (symbol==AMquote) i=str.slice(1).indexOf("\"")+1;
+      else if (symbol==AMquote) {
+        italic=false;
+        i=str.slice(1).indexOf("\"")+1;
+      }
+      else if (symbol==AMvar) {
+        italic=true;
+        i=str.slice(1).indexOf(" ")+1;
+      }
       else i = 0;
       if (i==-1) i = str.length;
       st = str.slice(1,i);
       if (st.charAt(0) == " ") {
 	      newFrag = '\\ ';
       }
-     newFrag += '\\text{'+st+'}';
+      newFrag += (italic ? '\\mathit{'+st+'}' : '\\text{'+st+'}');
       if (st.charAt(st.length-1) == " ") {
 	      newFrag += '\\ ';
       }
