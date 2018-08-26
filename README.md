@@ -31,4 +31,4 @@ npm install -g pandoc-filter
 pandoc --filter ./path/to/asciimathfilter.js [your options ...]
 ```
 
-The filter will apply conversion on any inline or block math object beginning with `:a`, e. g. `$:a sum_(k=1)^3 k$`.
+The filter will apply conversion on any inline or block math object beginning with `:a` or `&`, e. g. `$&a^2+b^2 = c^2$`.
