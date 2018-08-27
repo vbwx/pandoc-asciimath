@@ -34,8 +34,8 @@ var config = {
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath
   decimalsign: ".",           // change to "," if you like, beware of `(1,2)`!
-  AMdelimiter1: "`", AMescape1: "\\\\`", // can use other characters
-  AMusedelimiter2: false, 	  //whether to use second delimiter below
+  AMdelimiter1: "§", AMescape1: "\\\\§", // can use other characters
+  AMusedelimiter2: true, 	  //whether to use second delimiter below
   AMdelimiter2: "$", AMescape2: "\\\\\\$", AMdelimiter2regexp: "\\$",
   AMdocumentId: "wikitext",   // PmWiki element containing math (default=body)
   doubleblankmathdelimiter: false // if true,  x+1  is equal to `x+1`
@@ -55,6 +55,7 @@ var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
   AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
   AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
   AMvar   = {input:"#",    tag:"mtext", output:"mathit", tex:null, ttype:TEXT},
+  AMunit  = {input:"`",    tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
   AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
 var AMsymbols = [
@@ -320,7 +321,7 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
-AMtext, AMmbox, AMvar, AMquote,
+AMtext, AMmbox, AMvar, AMunit, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
 {input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
@@ -529,7 +530,7 @@ function AMTgetTeXsymbol(symb) {
 }
 
 function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
-  var symbol, node, result, i, st,// rightvert = false,
+  var symbol, node, result, i, st, match, italic, space,// rightvert = false,
     newFrag = '';
   str = AMremoveCharsAndBlanks(str,0);
   symbol = AMgetSymbol(str);             //either a token or a bracket or empty
@@ -584,18 +585,25 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     }
     return [node,result[1]];
   case TEXT:
-      var italic;
-      if (symbol!=AMquote && symbol!=AMvar) str = AMremoveCharsAndBlanks(str,symbol.input.length);
+      if (symbol!=AMquote && symbol!=AMvar && symbol!=AMunit) str = AMremoveCharsAndBlanks(str,symbol.input.length);
       if (str.charAt(0)=="{") i=str.indexOf("}");
       else if (str.charAt(0)=="(") i=str.indexOf(")");
       else if (str.charAt(0)=="[") i=str.indexOf("]");
       else if (symbol==AMquote) {
         italic=false;
+        space=false;
         i=str.slice(1).indexOf("\"")+1;
       }
       else if (symbol==AMvar) {
         italic=true;
-        i=str.slice(1).indexOf(" ")+1;
+        space=false;
+        match=str.slice(1).match(/[ !@#$%^&*()_\-+=[\]{}|\\'"<>,:;?\/~`]/);
+        i=(match ? match.index+1 : -1);
+      }
+      else if (symbol==AMunit) {
+        italic=false;
+        space=true;
+        i=str.slice(1).indexOf("`")+1;
       }
       else i = 0;
       if (i==-1) i = str.length;
@@ -603,11 +611,14 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       if (st.charAt(0) == " ") {
 	      newFrag = '\\ ';
       }
+      else if (space) {
+        newFrag = '\\,';
+      }
       newFrag += (italic ? '\\mathit{'+st+'}' : '\\text{'+st+'}');
       if (st.charAt(st.length-1) == " ") {
 	      newFrag += '\\ ';
       }
-      str = AMremoveCharsAndBlanks(str,i+1);
+      str = AMremoveCharsAndBlanks(str,i+(italic ? 0 : 1));
       return [newFrag,str];
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length);
