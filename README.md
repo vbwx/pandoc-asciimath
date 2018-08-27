@@ -1,9 +1,9 @@
-asciimathml pandocfilter
-========================
+AsciiMath Pandoc Filter
+=======================
 
 Node.js-based
-[Pandoc filters](https://github.com/jgm/pandoc/wiki/Pandoc-Filters)
-for converting asciimathml into TeX
+[Pandoc filter](https://github.com/jgm/pandoc/wiki/Pandoc-Filters)
+for converting AsciiMath into TeX
 
 This is a fork of the
 [asciimathml](https://github.com/asciimath/asciimathml) repository
@@ -17,10 +17,10 @@ providing the conversion scripts (originally for web browsers):
 
 ## Dependencies
 
-You need node.js and the [pandoc-filter](https://github.com/mvhenderson/pandoc-filter-node) package:
+You need node.js to install the required modules.
 
 ```
-npm install -g pandoc-filter
+npm install
 ```
 
 ## Usage
