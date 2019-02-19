@@ -31,4 +31,4 @@ npm install
 pandoc --filter ./path/to/asciimathfilter.js [your options ...]
 ```
 
-The filter will apply conversion on any inline or block math object beginning with `:a` or `&`, e. g. `$&a^2+b^2 = c^2$`.
+The filter will apply conversion on any inline or block math object beginning with `:a` or `?`, e. g. `$?a^2+b^2 = c^2$`.
