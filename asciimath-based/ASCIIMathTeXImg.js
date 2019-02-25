@@ -529,7 +529,7 @@ function AMTgetTeXsymbol(symb) {
 }
 
 function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
-	var symbol, node, result, i, st, match, italic,// rightvert = false,
+	var symbol, node, result, i, st, match,// rightvert = false,
 		newFrag = '';
 	str = AMremoveCharsAndBlanks(str,0);
 	symbol = AMgetSymbol(str);             //either a token or a bracket or empty
@@ -589,16 +589,13 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 			else if (str.charAt(0)=="(") i=str.indexOf(")");
 			else if (str.charAt(0)=="[") i=str.indexOf("]");
 			else if (symbol==AMquote) {
-				italic=false;
 				i=str.slice(1).indexOf("\"")+1;
 			}
 			else if (symbol==AMvar) {
-				italic=true;
 				match=str.slice(1).match(/[ !@#$%^&*()_\-+=[\]{}|\\'"<>,:;?\/~`]/);
 				i=(match ? match.index+1 : -1);
 			}
 			else if (symbol==AMunit) {
-				italic=false;
 				i=str.slice(1).indexOf("`")+1;
 			}
 			else i = 0;
@@ -607,11 +604,11 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 			if (st.charAt(0) == " ") {
 				newFrag = '\\ ';
 			}
-			newFrag += (italic ? '\\var{'+st+'}' : '\\text{'+st+'}');
+			newFrag += '\\'+symbol.output+'{'+st+'}';
 			if (st.charAt(st.length-1) == " ") {
 				newFrag += '\\ ';
 			}
-			str = AMremoveCharsAndBlanks(str,i+(italic ? 0 : 1));
+			str = AMremoveCharsAndBlanks(str,i+(symbol==AMvar ? 0 : 1));
 			return [newFrag,str];
 	case UNARY:
 			str = AMremoveCharsAndBlanks(str,symbol.input.length);
