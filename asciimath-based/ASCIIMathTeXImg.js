@@ -55,7 +55,7 @@ var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
 	AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 	AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 	AMvar   = {input:"#",    tag:"mtext", output:"mathit", tex:null, ttype:TEXT},
-	AMunit  = {input:"`",    tag:"mtext", output:"text", tex:null, ttype:TEXT},
+	AMunit  = {input:"`",    tag:"mtext", output:"mathrm", tex:null, ttype:TEXT},
 	AMquote = {input:"\"",   tag:"mtext", output:"text", tex:null, ttype:TEXT};
 
 var AMsymbols = [
